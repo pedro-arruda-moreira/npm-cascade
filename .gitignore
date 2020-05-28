@@ -110,6 +110,11 @@ dist
 
 #NPM
 package-lock.json
+*.cmd
+*.ps1
+
+#Unit Test writes
+*test_file*
 
 #VSCode
 .vscode

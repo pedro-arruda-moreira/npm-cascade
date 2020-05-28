@@ -12,8 +12,11 @@ if(os.platform() == 'win32') {
 const test_file = `${__dirname}${sep}test_file`;
 const dummyProjPath = `${__dirname}${sep}dummy1${sep}`;
 
-function run(targets: string[], path: string, callback: () => void) {
-    new NpmCascade(path, targets, callback).run();
+function run(targets: string[], path: string, callback: (cascade: NpmCascade) => void) {
+    const cascade = new NpmCascade(path, targets, () => {
+        callback(cascade);
+    });
+    cascade.run();
 }
 
 mocha.describe("npm-cascade", () => {
@@ -48,6 +51,12 @@ mocha.describe("npm-cascade", () => {
     mocha.it("must stop on error", (done) => {
         run(["test-error"], dummyProjPath, () => {
             chai.assert.isFalse(fs.existsSync(test_file));
+            done();
+        });
+    });
+    mocha.it("respects built-in NPM commands", (done) => {
+        run(["install"], dummyProjPath, (cascade) => {
+            chai.assert.equal(cascade.commandCount, 2)
             done();
         });
     });

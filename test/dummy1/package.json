@@ -10,7 +10,7 @@
   },
   "cascade": {
     "before": {
-      "test1, test2": [
+      "test1, test2, install": [
         "./dummy2"
       ]
     },

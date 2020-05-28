@@ -1,6 +1,7 @@
 import * as cp from "child_process";
 import * as fs from "fs";
 import * as os from "os";
+import npm from "npm";
 
 type Tuple<T> = {
     [name: string]: T;
@@ -20,6 +21,7 @@ interface PackageJson {
 interface Command {
     path: string;
     target: string;
+    isBuiltIn: boolean;
 }
 export class NpmCascade {
 
@@ -27,13 +29,16 @@ export class NpmCascade {
         private path: string,
         private targets: string[],
         private callback: () => void) {
-
     }
 
     private commands = [] as Command[];
 
+    get commandCount() {
+        return this.commands.length;
+    }
+
     private parsePackageJson(path: string): PackageJson {
-        return JSON.parse('' + fs.readFileSync(path)) as PackageJson;
+        return JSON.parse('' + fs.readFileSync(path.split('//').join('/'))) as PackageJson;
     }
 
     private scanAll(cascade: BeforeAfter<Tuple<string[]>> | undefined, type: string, path: string, target: string) {
@@ -59,18 +64,24 @@ export class NpmCascade {
     }
 
     private scanInPath(path: string, target: string) {
-        const packageJson = this.parsePackageJson((path + "/package.json").split('//').join('/'));
+        const packageJson = this.parsePackageJson((path + "/package.json"));
         let cascade = packageJson.cascade;
         this.scanAll(cascade, 'before', path, target);
-        if(packageJson.scripts[target]) {
+        const npmCommand = this.isNpmCommand(target);
+        if(packageJson.scripts[target] || npmCommand) {
             this.commands.push({
                 path,
-                target
+                target,
+                isBuiltIn: npmCommand
             });
         } else {
             console.log(`INFO: npm script '${target}' not found in '${path}' ... Continuing...`);
         }
         this.scanAll(cascade, 'after', path, target);
+    }
+
+    private isNpmCommand(target: string): boolean {
+        return (npm.commands as any)[target] != null;
     }
 
     private doExecute(index = 0) {
@@ -85,7 +96,11 @@ export class NpmCascade {
         if(os.platform() == 'win32') {
             execName = 'npm.cmd';
         }
-        const child = cp.spawn(execName, ["--prefix", comm.path, "run", comm.target]);
+        let args = ["--prefix", comm.path, "run", comm.target];
+        if(comm.isBuiltIn) {
+            args = ["--prefix", comm.path, comm.target];
+        }
+        const child = cp.spawn(execName, args);
         child.stdout.on('data', function(chunk) {
             console.log('' + chunk);
         });
@@ -103,13 +118,15 @@ export class NpmCascade {
     }
 
     run() {
-        console.log('INFO: scanning projects...');
-        for(const curr of this.targets) {
-            this.scanInPath(this.path, curr);
-        }
-        console.log(`INFO: found ${this.commands.length} command(s).`);
-        console.log('INFO: starting NPM ...');
-        this.doExecute();
+        npm.load({}, () => {
+            console.log('INFO: scanning projects...');
+            for(const curr of this.targets) {
+                this.scanInPath(this.path, curr);
+            }
+            console.log(`INFO: found ${this.commands.length} task(s).`);
+            console.log('INFO: starting NPM ...');
+            this.doExecute();
+        });
     }
 
 }
