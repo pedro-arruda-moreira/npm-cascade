@@ -1,0 +1,14 @@
+{
+  "name": "dummy2",
+  "version": "1.0.0",
+  "description": "dummy project for unit test",
+  "main": "index.js",
+  "scripts": {
+    "test1": "node ../../test-runner.js ../../ dummy2",
+    "test2": "node ../../test-runner.js ../../ dummy2",
+    "test3": "node ../../test-runner.js ../../ dummy2",
+    "test-error": "node ../../test-runner.js ../../ should_not_happen"
+  },
+  "author": "",
+  "license": "MIT"
+}

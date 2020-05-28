@@ -1,0 +1,52 @@
+{
+  "name": "npm-cascade",
+  "version": "1.0.0",
+  "description": "Cascade your NPM scripts on multi module projects!",
+  "main": "index.js",
+  "bin": "bin/npm-cascade.js",
+  "scripts": {
+    "test": "mocha",
+    "compile": "tsc",
+    "dependencies": "npm install -P -D",
+    "prepack": "npm run compile && npm test"
+  },
+  "engines": {
+    "node": ">= 8.10.0"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "index.js.map",
+    "bin/npm-cascade.js",
+    "bin/npm-cascade.d.ts",
+    "bin/npm-cascade.js.map",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pedro-arruda-moreira/npm-cascade.git"
+  },
+  "keywords": [
+    "npm",
+    "cascade",
+    "script",
+    "multi-module"
+  ],
+  "author": "Pedro Moreira",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pedro-arruda-moreira/npm-cascade/issues"
+  },
+  "homepage": "https://github.com/pedro-arruda-moreira/npm-cascade#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/chai": "^3.5.0",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^14.0.5",
+    "@types/npm": "^2.0.31",
+    "chai": "^4.2.0",
+    "mocha": "^7.2.0"
+  }
+}

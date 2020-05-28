@@ -1,0 +1,25 @@
+{
+  "name": "dummy1",
+  "version": "1.0.0",
+  "description": "dummy project for unit test",
+  "main": "index.js",
+  "scripts": {
+    "test1": "node ../test-runner.js ../ dummy1",
+    "test3": "node ../test-runner.js ../ dummy1",
+    "test-error": "exit 1"
+  },
+  "cascade": {
+    "before": {
+      "test1, test2": [
+        "./dummy2"
+      ]
+    },
+    "after": {
+      "test3, test-error": [
+        "./dummy2"
+      ]
+    }
+  },
+  "author": "",
+  "license": "MIT"
+}
