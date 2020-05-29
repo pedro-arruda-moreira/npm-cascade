@@ -33,6 +33,17 @@ export class NpmCascade {
 
     private commands = [] as Command[];
 
+    /**
+     * -1 = not executed
+     * 0 = success
+     * !=0 = error
+     */
+    private _exitCode = -1;
+
+    get exitCode() {
+        return this._exitCode;
+    }
+
     get commandCount() {
         return this.commands.length;
     }
@@ -86,6 +97,7 @@ export class NpmCascade {
 
     private doExecute(index = 0) {
         if(index >= this.commands.length) {
+            this._exitCode = 0;
             this.callback();
             return;
         }
@@ -111,6 +123,7 @@ export class NpmCascade {
             if(child.exitCode == 0) {
                 this.doExecute(index + 1);
             } else {
+                this._exitCode = child.exitCode as number;
                 console.log("INFO: aborted by error(s)!");
                 this.callback();
             }

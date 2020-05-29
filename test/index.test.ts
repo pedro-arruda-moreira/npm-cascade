@@ -31,26 +31,30 @@ mocha.describe("npm-cascade", () => {
         }
     });
     mocha.it("respects 'before' ordering", (done) => {
-        run(["test1"], dummyProjPath, () => {
+        run(["test1"], dummyProjPath, (cascade) => {
             chai.assert.equal('' + fs.readFileSync(test_file), "dummy1");
+            chai.assert.equal(cascade.exitCode, 0);
             done();
         });
     });
     mocha.it("run child if parent has no such script", (done) => {
-        run(["test2"], dummyProjPath, () => {
+        run(["test2"], dummyProjPath, (cascade) => {
             chai.assert.equal('' + fs.readFileSync(test_file), "dummy2");
+            chai.assert.equal(cascade.exitCode, 0);
             done();
         });
     });
     mocha.it("respects 'after' ordering", (done) => {
-        run(["test3"], dummyProjPath, () => {
+        run(["test3"], dummyProjPath, (cascade) => {
             chai.assert.equal('' + fs.readFileSync(test_file), "dummy2");
+            chai.assert.equal(cascade.exitCode, 0);
             done();
         });
     });
     mocha.it("must stop on error", (done) => {
-        run(["test-error"], dummyProjPath, () => {
+        run(["test-error"], dummyProjPath, (cascade) => {
             chai.assert.isFalse(fs.existsSync(test_file));
+            chai.assert.equal(cascade.exitCode, 1);
             done();
         });
     });
